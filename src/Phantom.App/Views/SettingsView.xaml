@@ -1,0 +1,154 @@
+<UserControl x:Class="Phantom.App.Views.SettingsView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <UserControl.Resources>
+        <Style x:Key="SettingsCard" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="0,0,0,12" />
+        </Style>
+        <Style x:Key="Bullet" TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+            <Setter Property="FontSize" Value="12.5" />
+            <Setter Property="Margin" Value="0,3" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,20,24,24" MaxWidth="860" HorizontalAlignment="Left">
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Monitoring" Style="{StaticResource Text.SectionTitle}" />
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,24,0">
+                            <TextBlock Text="Update speed" Style="{StaticResource Text.Body}" />
+                            <TextBlock Style="{StaticResource Text.Muted}" Text="How often Phantom samples processes and hardware. Slower speeds use less CPU and battery." />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" Width="210" ItemsSource="{Binding Intervals}" DisplayMemberPath="Label" SelectedItem="{Binding Interval}" VerticalAlignment="Center" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="History" Style="{StaticResource Text.SectionTitle}" />
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,24,0">
+                            <TextBlock Text="Record history" Style="{StaticResource Text.Body}" />
+                            <TextBlock Style="{StaticResource Text.Muted}" Text="Stores averaged metric samples and activity events in a local SQLite database. When off, nothing is written and only the current session is visible." />
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" Style="{StaticResource Switch}" IsChecked="{Binding PersistHistory}" VerticalAlignment="Center" />
+                    </Grid>
+                    <Border Style="{StaticResource Divider}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <StackPanel Margin="0,0,24,0">
+                            <TextBlock Text="Keep history for" Style="{StaticResource Text.Body}" />
+                            <TextBlock Style="{StaticResource Text.Muted}" Text="Older records are deleted automatically at startup and every few hours. You can clear everything at any time on the History page." />
+                        </StackPanel>
+                        <ComboBox Grid.Column="1" Width="210" ItemsSource="{Binding Retentions}" DisplayMemberPath="Label" SelectedItem="{Binding Retention}" VerticalAlignment="Center" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Activity detection" Style="{StaticResource Text.SectionTitle}" />
+                    <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,0" Text="A resource spike is recorded when usage stays above a threshold for three consecutive samples." />
+                    <Grid Margin="0,12,0,0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="38" />
+                            <RowDefinition Height="38" />
+                            <RowDefinition Height="38" />
+                        </Grid.RowDefinitions>
+                        <TextBlock Text="Single process CPU (share of total capacity)" Style="{StaticResource Text.Body}" VerticalAlignment="Center" />
+                        <ComboBox Grid.Column="1" Width="110" ItemsSource="{Binding SpikeLevels}" DisplayMemberPath="Label" SelectedItem="{Binding ProcessCpuSpike}" />
+                        <TextBlock Grid.Row="1" Text="Overall CPU" Style="{StaticResource Text.Body}" VerticalAlignment="Center" />
+                        <ComboBox Grid.Row="1" Grid.Column="1" Width="110" ItemsSource="{Binding SpikeLevels}" DisplayMemberPath="Label" SelectedItem="{Binding SystemCpuSpike}" />
+                        <TextBlock Grid.Row="2" Text="Memory in use" Style="{StaticResource Text.Body}" VerticalAlignment="Center" />
+                        <ComboBox Grid.Row="2" Grid.Column="1" Width="110" ItemsSource="{Binding SpikeLevels}" DisplayMemberPath="Label" SelectedItem="{Binding MemorySpike}" />
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Privacy and safety" Style="{StaticResource Text.SectionTitle}" Margin="0,0,0,6" />
+                    <TextBlock Style="{StaticResource Bullet}" Text="•  Read-only: Phantom never terminates, suspends, modifies or injects into any process, and never changes system configuration." />
+                    <TextBlock Style="{StaticResource Bullet}" Text="•  Local only: no telemetry, analytics or network requests. Everything Phantom records stays in the data folder below." />
+                    <TextBlock Style="{StaticResource Bullet}" Text="•  No elevation: Phantom runs with your privileges and never asks for administrator rights." />
+                    <TextBlock Style="{StaticResource Bullet}" Text="•  Minimal collection: process names, IDs and resource counters. No window titles, command lines, keystrokes, file contents or network payloads." />
+                    <Border Style="{StaticResource Notice}" Margin="0,10,0,0">
+                        <TextBlock Style="{StaticResource Text.Body}" FontSize="12.5" Text="{Binding Privilege}" />
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Telemetry sources" Style="{StaticResource Text.SectionTitle}" />
+                    <TextBlock Style="{StaticResource Text.Muted}" Margin="0,4,0,8" Text="What Phantom can measure on this computer. Unavailable sources are shown as “—” throughout the app, never as zero." />
+                    <ItemsControl ItemsSource="{Binding Sensors}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="0,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="110" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Text="{Binding Sensor}" Style="{StaticResource Text.Body}" />
+                                    <TextBlock Grid.Column="1">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock" BasedOn="{StaticResource Text.Body}">
+                                                <Setter Property="Text" Value="Unavailable" />
+                                                <Setter Property="Foreground" Value="{StaticResource Brush.Warn}" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsAvailable}" Value="True">
+                                                        <Setter Property="Text" Value="Available" />
+                                                        <Setter Property="Foreground" Value="{StaticResource Brush.Good}" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                    <TextBlock Grid.Column="2" Text="{Binding Reason}" Style="{StaticResource Text.Muted}" />
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+            </Border>
+
+            <Border Style="{StaticResource SettingsCard}">
+                <StackPanel>
+                    <TextBlock Text="Data and about" Style="{StaticResource Text.SectionTitle}" />
+                    <TextBlock Text="Data folder (settings, history database, logs)" Style="{StaticResource Field.Label}" />
+                    <TextBox Text="{Binding DataFolder, Mode=OneWay}" Style="{StaticResource Text.Selectable}" FontFamily="{StaticResource Font.Mono}" FontSize="12" />
+                    <TextBlock Text="Version" Style="{StaticResource Field.Label}" />
+                    <TextBlock Style="{StaticResource Text.Body}" FontSize="12.5">
+                        <Run Text="Phantom" /> <Run Text="{Binding Version, Mode=OneWay}" /> <Run Text="·" Foreground="{StaticResource Brush.TextMuted}" /> <Run Text="{Binding Runtime, Mode=OneWay}" />
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Margin="0,14,0,0">
+                        <Button Content="Open data folder" Command="{Binding OpenDataFolderCommand}" Margin="0,0,8,0" />
+                        <Button Content="Restore default settings" Command="{Binding ResetCommand}" />
+                        <TextBlock Text="{Binding SaveStatus}" Style="{StaticResource Text.Muted}" VerticalAlignment="Center" Margin="14,0,0,0" />
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

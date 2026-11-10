@@ -1,0 +1,132 @@
+<Window x:Class="Phantom.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:v="clr-namespace:Phantom.App.Views"
+        Title="Phantom" Width="1400" Height="880" MinWidth="1040" MinHeight="660"
+        WindowStartupLocation="CenterScreen"
+        Background="{StaticResource Brush.App}" Foreground="{StaticResource Brush.Text}"
+        FontFamily="{StaticResource Font.Ui}" FontSize="13"
+        TextOptions.TextFormattingMode="Ideal" UseLayoutRounding="True">
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="212" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="28" />
+        </Grid.RowDefinitions>
+
+        <!-- Sidebar -->
+        <Border Grid.RowSpan="2" Background="{StaticResource Brush.Sidebar}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,0,1,0">
+            <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="18,18,0,18">
+                    <Image Source="/Assets/phantom.ico" Width="26" Height="26" RenderOptions.BitmapScalingMode="HighQuality" />
+                    <StackPanel Margin="10,0,0,0" VerticalAlignment="Center">
+                        <TextBlock Text="Phantom" FontFamily="{StaticResource Font.Display}" FontSize="16" FontWeight="SemiBold" />
+                        <TextBlock Text="System intelligence" Style="{StaticResource Text.Muted}" FontSize="11" />
+                    </StackPanel>
+                </StackPanel>
+
+                <Border DockPanel.Dock="Bottom" Margin="14" Padding="12,10" CornerRadius="6" Background="{StaticResource Brush.Surface}"
+                        BorderBrush="{StaticResource Brush.Border}" BorderThickness="1">
+                    <StackPanel>
+                        <TextBlock Text="Read-only · local only" Style="{StaticResource Text.Label}" Foreground="{StaticResource Brush.Text}" />
+                        <TextBlock Style="{StaticResource Text.Muted}" FontSize="11" Margin="0,3,0,0"
+                                   Text="Phantom observes your system. It never changes it and sends nothing anywhere." />
+                    </StackPanel>
+                </Border>
+
+                <ListBox ItemsSource="{Binding Pages}" SelectedItem="{Binding Current, Mode=TwoWay}" Background="Transparent" BorderThickness="0"
+                         Margin="10,0" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem">
+                            <Setter Property="Foreground" Value="{StaticResource Brush.TextSecondary}" />
+                            <Setter Property="Cursor" Value="Hand" />
+                            <Setter Property="Margin" Value="0,1" />
+                            <Setter Property="FocusVisualStyle" Value="{StaticResource FocusVisual}" />
+                            <Setter Property="AutomationProperties.Name" Value="{Binding Title}" />
+                            <Setter Property="Template">
+                                <Setter.Value>
+                                    <ControlTemplate TargetType="ListBoxItem">
+                                        <Grid>
+                                            <Border x:Name="Root" Background="Transparent" CornerRadius="5" Height="36" />
+                                            <Border x:Name="Bar" Width="3" Height="16" CornerRadius="1.5" HorizontalAlignment="Left"
+                                                    Background="{StaticResource Brush.Accent}" Visibility="Collapsed" />
+                                            <ContentPresenter Margin="12,0" VerticalAlignment="Center" />
+                                        </Grid>
+                                        <ControlTemplate.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.Surface}" />
+                                                <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+                                            </Trigger>
+                                            <Trigger Property="IsSelected" Value="True">
+                                                <Setter TargetName="Root" Property="Background" Value="{StaticResource Brush.SurfaceRaised}" />
+                                                <Setter TargetName="Bar" Property="Visibility" Value="Visible" />
+                                                <Setter Property="Foreground" Value="{StaticResource Brush.Text}" />
+                                            </Trigger>
+                                        </ControlTemplate.Triggers>
+                                    </ControlTemplate>
+                                </Setter.Value>
+                            </Setter>
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="{Binding Icon}" FontFamily="{StaticResource Font.Icons}" FontSize="15" Width="22" VerticalAlignment="Center" />
+                                <TextBlock Text="{Binding Title}" FontSize="13" Margin="8,0,0,0" VerticalAlignment="Center" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!-- Top toolbar -->
+        <Border Grid.Column="1" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,0,0,1" Padding="24,0,16,0">
+            <DockPanel LastChildFill="False">
+                <StackPanel VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Current.Title}" Style="{StaticResource Text.PageTitle}" />
+                    <TextBlock Text="{Binding Current.Subtitle}" Style="{StaticResource Text.Muted}" />
+                </StackPanel>
+                <Button DockPanel.Dock="Right" Command="{Binding TogglePauseCommand}" MinWidth="96" VerticalAlignment="Center"
+                        ToolTip="Pause or resume all monitoring">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="{Binding PauseIcon}" FontFamily="{StaticResource Font.Icons}" FontSize="12" VerticalAlignment="Center" />
+                        <TextBlock Text="{Binding PauseLabel}" Margin="8,0,0,0" />
+                    </StackPanel>
+                </Button>
+                <Button DockPanel.Dock="Right" Style="{StaticResource Button.Ghost}" Command="{Binding RefreshCommand}" Margin="0,0,8,0" VerticalAlignment="Center"
+                        ToolTip="Sample now">
+                    <TextBlock Text="&#xE72C;" Style="{StaticResource Text.Icon}" FontSize="14" />
+                </Button>
+                <TextBlock DockPanel.Dock="Right" Text="{Binding Summary}" Style="{StaticResource Text.Label}" VerticalAlignment="Center" Margin="0,0,16,0" />
+            </DockPanel>
+        </Border>
+
+        <!-- Workspace: every page stays alive so it keeps its scroll position, zoom and selection. -->
+        <Grid Grid.Row="1" Grid.Column="1">
+            <v:OverviewView DataContext="{Binding Overview}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:SystemMapView DataContext="{Binding Map}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:ProcessesView DataContext="{Binding Processes}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:TimelineView DataContext="{Binding Timeline}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:PerformanceView DataContext="{Binding Performance}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:HistoryView DataContext="{Binding History}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+            <v:SettingsView DataContext="{Binding Settings}" Visibility="{Binding IsActive, Converter={StaticResource Vis}}" />
+        </Grid>
+
+        <!-- Status bar -->
+        <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource Brush.Sidebar}" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,1,0,0" Padding="14,0">
+            <DockPanel LastChildFill="False">
+                <Ellipse Width="7" Height="7" Fill="{Binding StateBrush}" VerticalAlignment="Center" />
+                <TextBlock Text="{Binding State}" Style="{StaticResource Text.Label}" FontSize="11.5" Foreground="{StaticResource Brush.Text}" VerticalAlignment="Center" Margin="8,0,0,0" />
+                <TextBlock Text="{Binding LastUpdate}" Style="{StaticResource Text.Label}" FontSize="11.5" VerticalAlignment="Center" Margin="18,0,0,0" />
+                <TextBlock Text="{Binding Cost}" Style="{StaticResource Text.Label}" FontSize="11.5" VerticalAlignment="Center" Margin="18,0,0,0"
+                           ToolTip="Time Phantom spent collecting the last sample" />
+                <TextBlock DockPanel.Dock="Right" Text="{Binding HistoryStatus}" Style="{StaticResource Text.Label}" FontSize="11.5" VerticalAlignment="Center" />
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

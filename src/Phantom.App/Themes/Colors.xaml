@@ -1,0 +1,62 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:po="http://schemas.microsoft.com/winfx/2006/xaml/presentation/options">
+
+    <!-- Surfaces: dark charcoal, stepping lighter with elevation. -->
+    <Color x:Key="Color.App">#FF16181C</Color>
+    <Color x:Key="Color.Sidebar">#FF111316</Color>
+    <Color x:Key="Color.Surface">#FF1C1F24</Color>
+    <Color x:Key="Color.SurfaceRaised">#FF23272E</Color>
+    <Color x:Key="Color.SurfaceHover">#FF2A2F37</Color>
+    <Color x:Key="Color.Border">#FF2A2F36</Color>
+    <Color x:Key="Color.BorderStrong">#FF3A4049</Color>
+
+    <Color x:Key="Color.Text">#FFE6E8EB</Color>
+    <Color x:Key="Color.TextSecondary">#FF9BA3AE</Color>
+    <Color x:Key="Color.TextMuted">#FF6B7480</Color>
+
+    <!-- One restrained accent plus semantic and data-series colours. -->
+    <Color x:Key="Color.Accent">#FF4C9AFF</Color>
+    <Color x:Key="Color.AccentHover">#FF6AAEFF</Color>
+    <Color x:Key="Color.AccentSubtle">#264C9AFF</Color>
+    <Color x:Key="Color.Good">#FF3FB68B</Color>
+    <Color x:Key="Color.Warn">#FFE0A93B</Color>
+    <Color x:Key="Color.Danger">#FFE5604D</Color>
+    <Color x:Key="Color.Violet">#FFA78BFA</Color>
+    <Color x:Key="Color.Cyan">#FF2CC6D3</Color>
+    <Color x:Key="Color.Pink">#FFF472B6</Color>
+
+    <SolidColorBrush x:Key="Brush.App" Color="{StaticResource Color.App}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Sidebar" Color="{StaticResource Color.Sidebar}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Surface" Color="{StaticResource Color.Surface}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.SurfaceRaised" Color="{StaticResource Color.SurfaceRaised}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.SurfaceHover" Color="{StaticResource Color.SurfaceHover}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Border" Color="{StaticResource Color.Border}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.BorderStrong" Color="{StaticResource Color.BorderStrong}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Text" Color="{StaticResource Color.Text}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.TextSecondary" Color="{StaticResource Color.TextSecondary}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.TextMuted" Color="{StaticResource Color.TextMuted}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Accent" Color="{StaticResource Color.Accent}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.AccentHover" Color="{StaticResource Color.AccentHover}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.AccentSubtle" Color="{StaticResource Color.AccentSubtle}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Good" Color="{StaticResource Color.Good}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Warn" Color="{StaticResource Color.Warn}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Danger" Color="{StaticResource Color.Danger}" po:Freeze="True" />
+
+    <!-- Series: one colour per resource, used consistently on every page. -->
+    <SolidColorBrush x:Key="Brush.Series.Cpu" Color="{StaticResource Color.Accent}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.Memory" Color="{StaticResource Color.Violet}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.Gpu" Color="{StaticResource Color.Good}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.Disk" Color="{StaticResource Color.Warn}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.DiskWrite" Color="{StaticResource Color.Danger}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.NetDown" Color="{StaticResource Color.Cyan}" po:Freeze="True" />
+    <SolidColorBrush x:Key="Brush.Series.NetUp" Color="{StaticResource Color.Pink}" po:Freeze="True" />
+
+    <FontFamily x:Key="Font.Ui">Segoe UI Variable Text, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Display">Segoe UI Variable Display, Segoe UI</FontFamily>
+    <FontFamily x:Key="Font.Mono">Cascadia Mono, Consolas</FontFamily>
+    <FontFamily x:Key="Font.Icons">Segoe Fluent Icons, Segoe MDL2 Assets</FontFamily>
+
+    <CornerRadius x:Key="Radius.Control">4</CornerRadius>
+    <CornerRadius x:Key="Radius.Card">8</CornerRadius>
+</ResourceDictionary>

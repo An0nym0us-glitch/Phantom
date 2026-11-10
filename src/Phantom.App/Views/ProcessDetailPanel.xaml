@@ -1,0 +1,117 @@
+<UserControl x:Class="Phantom.App.Views.ProcessDetailPanel"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <Grid>
+        <!-- Empty state -->
+        <StackPanel VerticalAlignment="Center" Margin="24"
+                    Visibility="{Binding HasProcess, Converter={StaticResource Vis}, ConverterParameter=invert}">
+            <TextBlock Text="&#xE9D9;" Style="{StaticResource Text.Icon}" FontSize="28" Foreground="{StaticResource Brush.TextMuted}" />
+            <TextBlock Text="No process selected" Style="{StaticResource Text.SectionTitle}" HorizontalAlignment="Center" Margin="0,12,0,4" />
+            <TextBlock Text="Select a process to inspect its identity, resources and relationships."
+                       Style="{StaticResource Text.Muted}" TextAlignment="Center" />
+        </StackPanel>
+
+        <ScrollViewer VerticalScrollBarVisibility="Auto" Visibility="{Binding HasProcess, Converter={StaticResource Vis}}">
+            <StackPanel Margin="16,14,16,20">
+                <TextBlock Text="{Binding Name}" Style="{StaticResource Text.PageTitle}" FontSize="17" TextTrimming="CharacterEllipsis" />
+                <TextBlock Style="{StaticResource Text.Label}" Margin="0,2,0,0">
+                    <Run Text="PID" /> <Run Text="{Binding Pid, Mode=OneWay}" />
+                </TextBlock>
+
+                <Border Style="{StaticResource Notice}" Margin="0,12,0,0" Visibility="{Binding HasExited, Converter={StaticResource Vis}}">
+                    <TextBlock Style="{StaticResource Text.Body}" FontSize="12"
+                               Text="This process has exited. The values below are the last ones recorded." />
+                </Border>
+
+                <Grid Margin="0,14,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition />
+                        <ColumnDefinition />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition />
+                        <RowDefinition />
+                    </Grid.RowDefinitions>
+                    <Border Style="{StaticResource Card}" Padding="12,10" Margin="0,0,4,8">
+                        <StackPanel>
+                            <TextBlock Text="CPU" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="{Binding Cpu}" Style="{StaticResource Text.Value}" FontSize="18" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Column="1" Style="{StaticResource Card}" Padding="12,10" Margin="4,0,0,8">
+                        <StackPanel>
+                            <TextBlock Text="Memory" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="{Binding Memory}" Style="{StaticResource Text.Value}" FontSize="18" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1" Style="{StaticResource Card}" Padding="12,10" Margin="0,0,4,0">
+                        <StackPanel>
+                            <TextBlock Text="Threads" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="{Binding Threads}" Style="{StaticResource Text.Value}" FontSize="18" />
+                        </StackPanel>
+                    </Border>
+                    <Border Grid.Row="1" Grid.Column="1" Style="{StaticResource Card}" Padding="12,10" Margin="4,0,0,0">
+                        <StackPanel>
+                            <TextBlock Text="Handles" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="{Binding Handles}" Style="{StaticResource Text.Value}" FontSize="18" />
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <TextBlock Text="Executable path" Style="{StaticResource Field.Label}" Margin="0,16,0,2" />
+                <TextBox Text="{Binding Path, Mode=OneWay}" Style="{StaticResource Text.Selectable}" FontFamily="{StaticResource Font.Mono}" FontSize="12" />
+
+                <TextBlock Text="Description" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Description, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Publisher" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Company, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="File version" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding FileVersion, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <Border Style="{StaticResource Divider}" Margin="0,14,0,4" />
+
+                <TextBlock Text="Parent process" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Parent, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Lineage" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Lineage, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Started" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Start, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Total CPU time" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding CpuTime, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Private bytes" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding PrivateBytes, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Architecture" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Architecture, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Account" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Owner, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Session" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Session, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <TextBlock Text="Has a visible window" Style="{StaticResource Field.Label}" />
+                <TextBox Text="{Binding Window, Mode=OneWay}" Style="{StaticResource Text.Selectable}" />
+
+                <Border Style="{StaticResource Divider}" Margin="0,14,0,4" />
+
+                <TextBlock Style="{StaticResource Field.Label}">
+                    <Run Text="Child processes" /> <Run Text="{Binding Children.Count, Mode=OneWay, StringFormat='({0})'}" />
+                </TextBlock>
+                <ItemsControl ItemsSource="{Binding Children}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <TextBlock Text="{Binding Display}" Style="{StaticResource Text.Body}" FontSize="12.5" Margin="0,2" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap" />
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</UserControl>

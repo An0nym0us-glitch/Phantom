@@ -21,8 +21,72 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
+      - name: Static XAML checks
+        run: python build/check-xaml.py
+
       - name: Build
         run: dotnet build Phantom.slnx -c Release
 
       - name: Test (unit + Windows integration)
-        run: dotnet test Phantom.slnx -c Release --no-build --logger "console;verbosity=normal"
+        run: dotnet test Phantom.slnx -c Release --no-build --logger "console;verbosity=minimal"
+
+      - name: Publish
+        shell: pwsh
+        run: ./build/publish.ps1 -SkipInstaller
+
+      - name: UI smoke test (launches the real app against live system data)
+        shell: pwsh
+        run: |
+          $out = Join-Path $env:RUNNER_TEMP 'smoke'
+          $data = Join-Path $env:RUNNER_TEMP 'smoke-data'
+          $p = Start-Process -FilePath artifacts/publish/win-x64/Phantom.exe -ArgumentList '--smoke-test', $out, '--data-dir', $data -PassThru
+          if (-not $p.WaitForExit(180000)) { $p.Kill(); Write-Host '::error::Smoke test timed out' }
+          Write-Host "Exit code: $($p.ExitCode)"
+          Get-ChildItem $out -ErrorAction SilentlyContinue | Select-Object Name, Length | Format-Table | Out-String | Write-Host
+          foreach ($f in 'smoke-ok.txt', 'smoke-failed.txt', 'binding-errors.txt') {
+            $path = Join-Path $out $f
+            if (Test-Path $path) { Write-Host "----- $f -----"; Get-Content $path | Select-Object -First 80 | Write-Host }
+          }
+          Write-Host '----- application log -----'
+          Get-ChildItem (Join-Path $data 'logs') -ErrorAction SilentlyContinue | ForEach-Object { Get-Content $_.FullName | Select-Object -Last 40 | Write-Host }
+          if ($p.ExitCode -ne 0 -or -not (Test-Path (Join-Path $out 'smoke-ok.txt'))) { exit 1 }
+
+      - name: Upload smoke test screenshots
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: smoke-screenshots
+          path: ${{ runner.temp }}/smoke
+          if-no-files-found: ignore
+
+      - name: Build installer (Inno Setup)
+        shell: pwsh
+        run: |
+          if (-not (Get-Command iscc.exe -ErrorAction SilentlyContinue) -and -not (Test-Path "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe")) {
+            choco install innosetup -y --no-progress
+          }
+          ./build/publish.ps1
+
+      - name: Verify installer (silent per-user install, launch, uninstall)
+        shell: pwsh
+        run: |
+          $setup = Get-ChildItem artifacts/installer -Filter '*.exe' | Select-Object -First 1
+          $target = Join-Path $env:RUNNER_TEMP 'PhantomInstalled'
+          $p = Start-Process $setup.FullName -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/CURRENTUSER', '/NORESTART', "/DIR=`"$target`"" -PassThru -Wait
+          if ($p.ExitCode -ne 0) { throw "Installer exited with $($p.ExitCode)" }
+          if (-not (Test-Path (Join-Path $target 'Phantom.exe'))) { throw 'Phantom.exe was not installed' }
+          $out = Join-Path $env:RUNNER_TEMP 'smoke-installed'
+          $run = Start-Process (Join-Path $target 'Phantom.exe') -ArgumentList '--smoke-test', $out, '--data-dir', (Join-Path $env:RUNNER_TEMP 'smoke-installed-data') -PassThru
+          if (-not $run.WaitForExit(180000)) { $run.Kill(); throw 'Installed app timed out' }
+          if ($run.ExitCode -ne 0) { Get-Content (Join-Path $out 'smoke-failed.txt') -ErrorAction SilentlyContinue | Write-Host; throw "Installed app exited with $($run.ExitCode)" }
+          $un = Start-Process (Join-Path $target 'unins000.exe') -ArgumentList '/VERYSILENT', '/SUPPRESSMSGBOXES', '/NORESTART' -PassThru -Wait
+          if ($un.ExitCode -ne 0) { throw "Uninstaller exited with $($un.ExitCode)" }
+          Start-Sleep -Seconds 3
+          if (Test-Path (Join-Path $target 'Phantom.exe')) { throw 'Uninstall left Phantom.exe behind' }
+          Write-Host "Installer verified: $($setup.Name) ($([math]::Round($setup.Length / 1MB, 1)) MB)"
+
+      - name: Upload installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: phantom-installer
+          path: artifacts/installer/*.exe

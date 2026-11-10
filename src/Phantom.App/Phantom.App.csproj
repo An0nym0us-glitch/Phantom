@@ -1,11 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <AssemblyName>Phantom</AssemblyName>
+    <RootNamespace>Phantom.App</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\phantom.ico</ApplicationIcon>
+    <Platforms>AnyCPU;x64</Platforms>
+    <TieredPGO>true</TieredPGO>
+    <InvariantGlobalization>false</InvariantGlobalization>
   </PropertyGroup>
 
   <ItemGroup>
@@ -13,13 +18,17 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Phantom.Core\Phantom.Core.csproj" />
-    <ProjectReference Include="..\Phantom.ProcessMonitoring\Phantom.ProcessMonitoring.csproj" />
-    <ProjectReference Include="..\Phantom.SystemMonitoring\Phantom.SystemMonitoring.csproj" />
-    <ProjectReference Include="..\Phantom.SystemMap\Phantom.SystemMap.csproj" />
     <ProjectReference Include="..\Phantom.Activity\Phantom.Activity.csproj" />
-    <ProjectReference Include="..\Phantom.Storage\Phantom.Storage.csproj" />
+    <ProjectReference Include="..\Phantom.Core\Phantom.Core.csproj" />
     <ProjectReference Include="..\Phantom.Infrastructure\Phantom.Infrastructure.csproj" />
+    <ProjectReference Include="..\Phantom.ProcessMonitoring\Phantom.ProcessMonitoring.csproj" />
+    <ProjectReference Include="..\Phantom.Storage\Phantom.Storage.csproj" />
+    <ProjectReference Include="..\Phantom.SystemMap\Phantom.SystemMap.csproj" />
+    <ProjectReference Include="..\Phantom.SystemMonitoring\Phantom.SystemMonitoring.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\phantom.ico" />
   </ItemGroup>
 
 </Project>

@@ -1,0 +1,196 @@
+<UserControl x:Class="Phantom.App.Views.HistoryView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:ctl="clr-namespace:Phantom.App.Controls">
+    <UserControl.Resources>
+        <Style x:Key="ChartFrame" TargetType="Border">
+            <Setter Property="BorderBrush" Value="{StaticResource Brush.Border}" />
+            <Setter Property="BorderThickness" Value="1" />
+            <Setter Property="CornerRadius" Value="3" />
+            <Setter Property="Margin" Value="0,10,0,0" />
+        </Style>
+        <Style x:Key="HistoryCard" TargetType="Border" BasedOn="{StaticResource Card}">
+            <Setter Property="Margin" Value="6" />
+            <Setter Property="Padding" Value="14,12" />
+        </Style>
+    </UserControl.Resources>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24,20,24,24">
+
+            <Border Style="{StaticResource Notice}" Margin="0,0,0,12" Visibility="{Binding StoreMessage, Converter={StaticResource Vis}}">
+                <TextBlock Style="{StaticResource Text.Body}" FontSize="12.5" Text="{Binding StoreMessage}" />
+            </Border>
+
+            <DockPanel LastChildFill="False">
+                <ComboBox Width="170" ItemsSource="{Binding RangeOptions}" SelectedIndex="{Binding RangeIndex}" />
+                <Button Content="Refresh" Command="{Binding RefreshCommand}" Margin="10,0,0,0" />
+                <TextBlock Text="{Binding RangeLabel}" Style="{StaticResource Text.Label}" VerticalAlignment="Center" Margin="16,0,0,0" />
+                <TextBlock DockPanel.Dock="Right" Text="{Binding Coverage}" Style="{StaticResource Text.Muted}" VerticalAlignment="Center" />
+            </DockPanel>
+
+            <UniformGrid Columns="3" Margin="-6,8,-6,0" IsEnabled="{Binding IsAvailable}">
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.Cpu}" />
+                            <TextBlock Text="CPU utilization (0 – 100%)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding Cpu}" Stroke="{StaticResource Brush.Series.Cpu}" Maximum="100" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.Memory}" />
+                            <TextBlock Text="Memory in use (0 – 100%)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding Memory}" Stroke="{StaticResource Brush.Series.Memory}" Maximum="100" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.Gpu}" />
+                            <TextBlock Text="GPU utilization (0 – 100%)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding Gpu}" Stroke="{StaticResource Brush.Series.Gpu}" Maximum="100" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.Disk}" />
+                            <TextBlock Text="Disk read" Style="{StaticResource Text.Label}" Margin="0,0,12,0" />
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.DiskWrite}" />
+                            <TextBlock Text="write (auto scale)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding DiskRead}" Values2="{Binding DiskWrite}" Stroke="{StaticResource Brush.Series.Disk}"
+                                           Stroke2="{StaticResource Brush.Series.DiskWrite}" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.NetDown}" />
+                            <TextBlock Text="Network download" Style="{StaticResource Text.Label}" Margin="0,0,12,0" />
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.NetUp}" />
+                            <TextBlock Text="upload (auto scale)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding NetDown}" Values2="{Binding NetUp}" Stroke="{StaticResource Brush.Series.NetDown}"
+                                           Stroke2="{StaticResource Brush.Series.NetUp}" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource HistoryCard}">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.TextSecondary}" />
+                            <TextBlock Text="Process count (auto scale)" Style="{StaticResource Text.Label}" />
+                        </StackPanel>
+                        <Border Style="{StaticResource ChartFrame}">
+                            <ctl:LineChart Height="110" Values="{Binding Processes}" Stroke="{StaticResource Brush.TextSecondary}" GridBrush="{StaticResource Brush.Border}" />
+                        </Border>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+
+            <Grid Margin="0,6,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="12" />
+                    <ColumnDefinition Width="2*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Stored data" Style="{StaticResource Text.SectionTitle}" />
+                        <UniformGrid Columns="5" Margin="0,10,0,0">
+                            <StackPanel>
+                                <TextBlock Text="Metric samples" Style="{StaticResource Text.Muted}" />
+                                <TextBlock Text="{Binding StatSamples}" Style="{StaticResource Text.Body}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Activity events" Style="{StaticResource Text.Muted}" />
+                                <TextBlock Text="{Binding StatEvents}" Style="{StaticResource Text.Body}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Sessions" Style="{StaticResource Text.Muted}" />
+                                <TextBlock Text="{Binding StatSessions}" Style="{StaticResource Text.Body}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Database size" Style="{StaticResource Text.Muted}" />
+                                <TextBlock Text="{Binding StatSize}" Style="{StaticResource Text.Body}" />
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Oldest record" Style="{StaticResource Text.Muted}" />
+                                <TextBlock Text="{Binding StatOldest}" Style="{StaticResource Text.Body}" />
+                            </StackPanel>
+                        </UniformGrid>
+                        <TextBlock Text="{Binding RetentionText}" Style="{StaticResource Text.Muted}" Margin="0,10,0,0" />
+
+                        <Border Style="{StaticResource Divider}" />
+                        <TextBlock Text="Export the selected period" Style="{StaticResource Text.Label}" Margin="0,0,0,8" />
+                        <WrapPanel>
+                            <Button Content="Metrics as CSV" Command="{Binding ExportMetricsCommand}" CommandParameter="csv" Margin="0,0,8,8" />
+                            <Button Content="Metrics as JSON" Command="{Binding ExportMetricsCommand}" CommandParameter="json" Margin="0,0,8,8" />
+                            <Button Content="Events as CSV" Command="{Binding ExportEventsCommand}" CommandParameter="csv" Margin="0,0,8,8" />
+                            <Button Content="Events as JSON" Command="{Binding ExportEventsCommand}" CommandParameter="json" Margin="0,0,8,8" />
+                        </WrapPanel>
+
+                        <TextBlock Text="Maintenance" Style="{StaticResource Text.Label}" Margin="0,6,0,8" />
+                        <WrapPanel>
+                            <Button Content="Apply retention now" Command="{Binding ApplyRetentionCommand}" Margin="0,0,8,8" />
+                            <Button Content="Compact database" Command="{Binding CompactCommand}" Margin="0,0,8,8" />
+                            <Button Content="Open data folder" Command="{Binding OpenFolderCommand}" Margin="0,0,8,8" />
+                            <Button Content="Clear all history…" Style="{StaticResource Button.Danger}" Command="{Binding ClearCommand}" Margin="0,0,8,8" />
+                        </WrapPanel>
+                        <TextBlock Text="{Binding Status}" Style="{StaticResource Text.Body}" FontSize="12.5" Foreground="{StaticResource Brush.TextSecondary}"
+                                   Visibility="{Binding Status, Converter={StaticResource Vis}}" />
+                        <TextBlock Style="{StaticResource Text.Muted}" FontSize="11" Margin="0,8,0,0">
+                            <Run Text="Database:" /> <Run Text="{Binding DatabasePath, Mode=OneWay}" />
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Style="{StaticResource Card}">
+                    <StackPanel>
+                        <TextBlock Text="Monitoring sessions" Style="{StaticResource Text.SectionTitle}" Margin="0,0,0,6" />
+                        <ItemsControl ItemsSource="{Binding Sessions}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Margin="0,5">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="Auto" />
+                                        </Grid.ColumnDefinitions>
+                                        <StackPanel>
+                                            <TextBlock Style="{StaticResource Text.Body}" FontSize="12.5">
+                                                <Run Text="{Binding Started, Mode=OneWay}" /> <Run Text="→" Foreground="{StaticResource Brush.TextMuted}" /> <Run Text="{Binding Ended, Mode=OneWay}" />
+                                            </TextBlock>
+                                            <TextBlock Style="{StaticResource Text.Muted}" FontSize="11">
+                                                <Run Text="Phantom" /> <Run Text="{Binding Version, Mode=OneWay}" />
+                                            </TextBlock>
+                                        </StackPanel>
+                                        <TextBlock Grid.Column="1" Text="{Binding Duration}" Style="{StaticResource Text.Mono}" Foreground="{StaticResource Brush.TextSecondary}" Margin="10,0,0,0" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                        <TextBlock Text="No sessions recorded." Style="{StaticResource Text.Muted}"
+                                   Visibility="{Binding Sessions.Count, Converter={StaticResource Vis}, ConverterParameter=invert}" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

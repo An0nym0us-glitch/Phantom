@@ -20,7 +20,7 @@ public class WindowsIntegrationTests
 
         Assert.True(processes.Count > 10);
         Assert.Equal(processes.Count, processes.Select(p => p.Pid).Distinct().Count());
-        Assert.Contains(processes, p => p.Pid == 0 && p.Name == "System Idle Process" && p.StartTimeUtc is null);
+        Assert.Contains(processes, p => p.Pid == 0 && p.Name == "System Idle Process" && p.HandleCount is null);
         Assert.Contains(processes, p => p.Pid == 4 && p.Name == "System");
 
         var me = processes.Single(p => p.Pid == Environment.ProcessId);
