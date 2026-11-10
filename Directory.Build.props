@@ -1,0 +1,15 @@
+<Project>
+  <PropertyGroup>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
+    <Version>0.1.0</Version>
+    <Company>Project Phantom</Company>
+    <Product>Phantom</Product>
+    <Copyright>Copyright (c) Project Phantom contributors</Copyright>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <NuGetAudit>false</NuGetAudit>
+  </PropertyGroup>
+</Project>

@@ -1,0 +1,31 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Phantom.Core\Phantom.Core.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.ProcessMonitoring\Phantom.ProcessMonitoring.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.SystemMonitoring\Phantom.SystemMonitoring.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.SystemMap\Phantom.SystemMap.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.Activity\Phantom.Activity.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.Storage\Phantom.Storage.csproj" />
+    <ProjectReference Include="..\..\src\Phantom.Infrastructure\Phantom.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

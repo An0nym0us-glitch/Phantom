@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Phantom.Activity/Phantom.Activity.csproj" />
+    <Project Path="src/Phantom.App/Phantom.App.csproj" />
+    <Project Path="src/Phantom.Core/Phantom.Core.csproj" />
+    <Project Path="src/Phantom.Infrastructure/Phantom.Infrastructure.csproj" />
+    <Project Path="src/Phantom.ProcessMonitoring/Phantom.ProcessMonitoring.csproj" />
+    <Project Path="src/Phantom.Storage/Phantom.Storage.csproj" />
+    <Project Path="src/Phantom.SystemMap/Phantom.SystemMap.csproj" />
+    <Project Path="src/Phantom.SystemMonitoring/Phantom.SystemMonitoring.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Phantom.Tests/Phantom.Tests.csproj" />
+  </Folder>
+</Solution>
