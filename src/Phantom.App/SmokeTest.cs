@@ -134,6 +134,20 @@ internal sealed class SmokeTest
             log.AppendLine($"Timeline: {shell.Timeline.Items.Count} items — {shell.Timeline.Summary}");
             Capture($"{index:00}-timeline-session");
 
+            // Overview was measured first, while startup work was still settling; measure it again now.
+            shell.Current = shell.Overview;
+            await Task.Delay(2200);
+            lock (_selfCpu)
+            {
+                _selfCpu.Clear();
+            }
+
+            await Task.Delay(3300);
+            lock (_selfCpu)
+            {
+                log.AppendLine($"Overview re-measured after warm-up: self CPU {(_selfCpu.Count > 0 ? _selfCpu.Average() : double.NaN):0.0}%");
+            }
+
             log.AppendLine($"Status: {shell.State} | {shell.Summary} | {shell.Cost} | {shell.HistoryStatus}");
             log.AppendLine($"Binding errors: {_bindingErrors.Messages.Count}");
             File.WriteAllText(Path.Combine(_directory, "binding-errors.txt"), string.Join(Environment.NewLine, _bindingErrors.Messages));

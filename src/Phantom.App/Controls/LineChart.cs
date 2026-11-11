@@ -150,6 +150,7 @@ public sealed class LineChart : FrameworkElement
         double X(int i) => (offset + i) * step;
         double Y(double v) => inset + (usable * (1 - Math.Clamp(v / max, 0, 1)));
 
+        List<Point>? isolated = null;
         var line = new StreamGeometry();
         StreamGeometry? area = FillArea ? new StreamGeometry() : null;
         using (var lc = line.Open())
@@ -180,7 +181,7 @@ public sealed class LineChart : FrameworkElement
                     if (i - runStart == 1)
                     {
                         // A single isolated sample still deserves a visible mark.
-                        lc.LineTo(new Point(X(runStart) + 0.01, Y(values[runStart])), true, true);
+                        (isolated ??= []).Add(new Point(X(runStart), Y(values[runStart])));
                     }
 
                     ac?.LineTo(new Point(X(i - 1), h), false, false);
@@ -202,5 +203,12 @@ public sealed class LineChart : FrameworkElement
         var pen = new Pen(stroke, 1.5) { LineJoin = PenLineJoin.Round, StartLineCap = PenLineCap.Round, EndLineCap = PenLineCap.Round };
         pen.Freeze();
         dc.DrawGeometry(null, pen, line);
+        if (isolated is not null)
+        {
+            foreach (var point in isolated)
+            {
+                dc.DrawEllipse(stroke, null, new Point(Math.Clamp(point.X, 2, w - 2), point.Y), 2, 2);
+            }
+        }
     }
 }

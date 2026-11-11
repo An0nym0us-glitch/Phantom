@@ -384,11 +384,15 @@ public sealed class SystemMapCanvas : FrameworkElement
             maxY = Math.Max(maxY, p.Y);
         }
 
-        const double margin = 70;
-        double zoom = Math.Min((ActualWidth - margin) / Math.Max(1, maxX - minX), (ActualHeight - margin) / Math.Max(1, maxY - minY));
+        // Leave room for labels beside the outermost nodes and for the legend along the bottom.
+        const double padX = 80, padTop = 44, padBottom = 104;
+        double availableWidth = Math.Max(40, ActualWidth - (2 * padX));
+        double availableHeight = Math.Max(40, ActualHeight - padTop - padBottom);
+        double zoom = Math.Min(availableWidth / Math.Max(1, maxX - minX), availableHeight / Math.Max(1, maxY - minY));
         zoom = Math.Clamp(zoom, MinZoom, 1.4);
         var center = new Vector((minX + maxX) / 2, (minY + maxY) / 2);
-        MoveView(zoom, new Vector(ActualWidth / 2, ActualHeight / 2) - (center * zoom), animate);
+        var viewCenter = new Vector(ActualWidth / 2, padTop + (availableHeight / 2));
+        MoveView(zoom, viewCenter - (center * zoom), animate);
         _hasFitted = true;
     }
 
