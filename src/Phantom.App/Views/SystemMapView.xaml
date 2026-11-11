@@ -15,12 +15,12 @@
 
         <!-- Map toolbar -->
         <Border Grid.ColumnSpan="2" BorderBrush="{StaticResource Brush.Border}" BorderThickness="0,0,0,1" Padding="16,8">
-            <DockPanel LastChildFill="False">
-                <TextBox x:Name="SearchBox" Width="230" Tag="Search by name or PID — Enter for next"
+            <WrapPanel>
+                <TextBox x:Name="SearchBox" Width="210" Margin="0,2" Tag="Search name or PID" ToolTip="Search by name or PID. Press Enter to jump to the next match."
                          Text="{Binding SearchText, UpdateSourceTrigger=PropertyChanged}" KeyDown="OnSearchKeyDown" />
-                <TextBlock x:Name="MatchText" Style="{StaticResource Text.Muted}" VerticalAlignment="Center" Margin="10,0,0,0" MinWidth="70" />
+                <TextBlock x:Name="MatchText" Style="{StaticResource Text.Muted}" VerticalAlignment="Center" Margin="10,0,0,0" MinWidth="74" />
 
-                <StackPanel Orientation="Horizontal" Margin="8,0,0,0" VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Margin="4,2,10,2" VerticalAlignment="Center">
                     <RadioButton Style="{StaticResource Chip.Radio}" Content="All" GroupName="MapFilter"
                                  IsChecked="{Binding FilterIndex, Converter={StaticResource IndexToBool}, ConverterParameter=0}" />
                     <RadioButton Style="{StaticResource Chip.Radio}" Content="My processes" GroupName="MapFilter"
@@ -29,7 +29,7 @@
                                  IsChecked="{Binding FilterIndex, Converter={StaticResource IndexToBool}, ConverterParameter=2}" />
                 </StackPanel>
 
-                <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <StackPanel Orientation="Horizontal" Margin="0,2">
                     <Button Style="{StaticResource Button.Ghost}" Content="Collapse all" Command="{Binding CollapseAllCommand}" ToolTip="Collapse every process tree to its root" />
                     <Button Style="{StaticResource Button.Ghost}" Content="Expand all" Command="{Binding ExpandAllCommand}" />
                     <Border Width="1" Background="{StaticResource Brush.Border}" Margin="8,4" />
@@ -50,7 +50,7 @@
                         <TextBlock Text="&#xE8A0;" Style="{StaticResource Text.Icon}" FontSize="14" />
                     </Button>
                 </StackPanel>
-            </DockPanel>
+            </WrapPanel>
         </Border>
 
         <!-- Canvas -->
@@ -81,7 +81,7 @@
                 </StackPanel>
             </Border>
 
-            <TextBlock Text="{Binding Summary}" Style="{StaticResource Text.Muted}" FontSize="11" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="16" IsHitTestVisible="False" />
+            <TextBlock Text="{Binding Summary}" Style="{StaticResource Text.Muted}" FontSize="11" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="16,12" IsHitTestVisible="False" />
         </Grid>
 
         <!-- Inspector -->

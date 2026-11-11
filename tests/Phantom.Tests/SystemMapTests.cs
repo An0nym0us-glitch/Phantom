@@ -206,3 +206,40 @@ public class SystemMapTests
         Assert.True(sw.ElapsedMilliseconds < 1000, $"Layout took {sw.ElapsedMilliseconds} ms.");
     }
 }
+
+public class LayoutCompactnessTests
+{
+    [Fact]
+    public void A_few_small_siblings_do_not_inflate_the_ring_of_a_large_one()
+    {
+        // wininit.exe → services.exe (90 children) + two leaf siblings, as on a real system.
+        var list = new List<Phantom.Core.Models.ProcessInfo>
+        {
+            Make.Process(1, 0, "wininit.exe"),
+            Make.Process(2, 1, "services.exe", 1),
+            Make.Process(3, 1, "lsass.exe", 2),
+            Make.Process(4, 1, "fontdrvhost.exe", 3),
+        };
+        for (int i = 0; i < 90; i++)
+        {
+            list.Add(Make.Process(100 + i, 2, "svchost.exe", 10 + i));
+        }
+
+        var layout = RadialClusterLayout.Compute(ProcessGraph.Build(list, ProcessFilter.All, null));
+        var cluster = Assert.Single(layout.Clusters);
+        var points = layout.Positions.Values.ToArray();
+
+        // 90 nodes at 46 units apart on three sub-rings need a radius of roughly 220-330.
+        Assert.InRange(cluster.Radius, 200, 480);
+        double min = double.MaxValue;
+        for (int i = 0; i < points.Length; i++)
+        {
+            for (int j = i + 1; j < points.Length; j++)
+            {
+                min = Math.Min(min, Math.Sqrt(Math.Pow(points[i].X - points[j].X, 2) + Math.Pow(points[i].Y - points[j].Y, 2)));
+            }
+        }
+
+        Assert.True(min >= 30, $"Closest pair of nodes is only {min:0.0} units apart.");
+    }
+}

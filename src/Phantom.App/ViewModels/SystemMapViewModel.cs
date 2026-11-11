@@ -19,6 +19,7 @@ public sealed class SystemMapViewModel : PageViewModel
     private string _summary = "";
     private bool _building;
     private bool _rebuildRequested;
+    private bool _refitRequested;
     private bool _inspectorOpen = true;
 
     public SystemMapViewModel(UiFrameHub hub)
@@ -28,7 +29,7 @@ public sealed class SystemMapViewModel : PageViewModel
         ExpandAllCommand = new RelayCommand(() =>
         {
             _collapsed.Clear();
-            Rebuild();
+            Rebuild(refit: true);
         });
         ToggleSelectedCommand = new RelayCommand(() =>
         {
@@ -96,7 +97,7 @@ public sealed class SystemMapViewModel : PageViewModel
         {
             if (Set(ref _filterIndex, value))
             {
-                Rebuild();
+                Rebuild(refit: true);
             }
         }
     }
@@ -108,7 +109,7 @@ public sealed class SystemMapViewModel : PageViewModel
             _collapsed.Add(key);
         }
 
-        Rebuild();
+        Rebuild(refit: true);
     }
 
     private void CollapseAll()
@@ -127,17 +128,19 @@ public sealed class SystemMapViewModel : PageViewModel
             }
         }
 
-        Rebuild();
+        Rebuild(refit: true);
     }
 
     protected override void OnActivated() => Rebuild();
+
 
     /// <summary>
     /// Rebuilds the scene off the UI thread. Requests arriving while a build is running are
     /// merged into a single follow-up build, and layout is recomputed only when topology changed.
     /// </summary>
-    private async void Rebuild()
+    private async void Rebuild(bool refit = false)
     {
+        _refitRequested |= refit;
         if (_hub.Latest is not { } frame)
         {
             return;
@@ -160,6 +163,8 @@ public sealed class SystemMapViewModel : PageViewModel
                 var filter = (ProcessFilter)Math.Clamp(_filterIndex, 0, 2);
                 var collapsed = new HashSet<ProcessKey>(_collapsed);
                 var previous = _scene;
+                bool reframe = _refitRequested;
+                _refitRequested = false;
 
                 var scene = await Task.Run(() =>
                 {
@@ -167,7 +172,7 @@ public sealed class SystemMapViewModel : PageViewModel
                     var layout = previous is not null && previous.Graph.TopologySignature == graph.TopologySignature
                         ? previous.Layout
                         : RadialClusterLayout.Compute(graph);
-                    return new MapScene(graph, layout);
+                    return new MapScene(graph, layout, reframe);
                 });
 
                 Scene = scene;

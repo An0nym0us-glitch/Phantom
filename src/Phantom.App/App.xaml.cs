@@ -64,7 +64,7 @@ public partial class App : Application
 
             if (smokeDirectory is not null)
             {
-                _smokeTest = new SmokeTest(this, window, smokeDirectory);
+                _smokeTest = new SmokeTest(this, window, smokeDirectory, engine);
                 _smokeTest.Start();
             }
         }

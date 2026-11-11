@@ -69,7 +69,7 @@
                             <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.Disk}" />
                             <TextBlock Text="Disk read" Style="{StaticResource Text.Label}" Margin="0,0,12,0" />
                             <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.DiskWrite}" />
-                            <TextBlock Text="write (auto scale)" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="write" Style="{StaticResource Text.Label}" />
                         </StackPanel>
                         <Border Style="{StaticResource ChartFrame}">
                             <ctl:LineChart Height="110" Values="{Binding DiskRead}" Values2="{Binding DiskWrite}" Stroke="{StaticResource Brush.Series.Disk}"
@@ -81,9 +81,9 @@
                     <StackPanel>
                         <StackPanel Orientation="Horizontal">
                             <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.NetDown}" />
-                            <TextBlock Text="Network download" Style="{StaticResource Text.Label}" Margin="0,0,12,0" />
+                            <TextBlock Text="Network down" Style="{StaticResource Text.Label}" Margin="0,0,12,0" />
                             <Ellipse Style="{StaticResource Dot}" Fill="{StaticResource Brush.Series.NetUp}" />
-                            <TextBlock Text="upload (auto scale)" Style="{StaticResource Text.Label}" />
+                            <TextBlock Text="upload" Style="{StaticResource Text.Label}" />
                         </StackPanel>
                         <Border Style="{StaticResource ChartFrame}">
                             <ctl:LineChart Height="110" Values="{Binding NetDown}" Values2="{Binding NetUp}" Stroke="{StaticResource Brush.Series.NetDown}"
@@ -114,28 +114,28 @@
                 <Border Style="{StaticResource Card}">
                     <StackPanel>
                         <TextBlock Text="Stored data" Style="{StaticResource Text.SectionTitle}" />
-                        <UniformGrid Columns="5" Margin="0,10,0,0">
-                            <StackPanel>
+                        <WrapPanel Margin="0,6,0,0">
+                            <StackPanel MinWidth="124" Margin="0,6,16,0">
                                 <TextBlock Text="Metric samples" Style="{StaticResource Text.Muted}" />
                                 <TextBlock Text="{Binding StatSamples}" Style="{StaticResource Text.Body}" />
                             </StackPanel>
-                            <StackPanel>
+                            <StackPanel MinWidth="124" Margin="0,6,16,0">
                                 <TextBlock Text="Activity events" Style="{StaticResource Text.Muted}" />
                                 <TextBlock Text="{Binding StatEvents}" Style="{StaticResource Text.Body}" />
                             </StackPanel>
-                            <StackPanel>
+                            <StackPanel MinWidth="124" Margin="0,6,16,0">
                                 <TextBlock Text="Sessions" Style="{StaticResource Text.Muted}" />
                                 <TextBlock Text="{Binding StatSessions}" Style="{StaticResource Text.Body}" />
                             </StackPanel>
-                            <StackPanel>
+                            <StackPanel MinWidth="124" Margin="0,6,16,0">
                                 <TextBlock Text="Database size" Style="{StaticResource Text.Muted}" />
                                 <TextBlock Text="{Binding StatSize}" Style="{StaticResource Text.Body}" />
                             </StackPanel>
-                            <StackPanel>
+                            <StackPanel MinWidth="124" Margin="0,6,16,0">
                                 <TextBlock Text="Oldest record" Style="{StaticResource Text.Muted}" />
                                 <TextBlock Text="{Binding StatOldest}" Style="{StaticResource Text.Body}" />
                             </StackPanel>
-                        </UniformGrid>
+                        </WrapPanel>
                         <TextBlock Text="{Binding RetentionText}" Style="{StaticResource Text.Muted}" Margin="0,10,0,0" />
 
                         <Border Style="{StaticResource Divider}" />

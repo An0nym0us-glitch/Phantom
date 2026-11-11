@@ -148,29 +148,35 @@ public static class RadialClusterLayout
             }
         }
 
-        // Size each ring so its tightest wedge still has room for a node. Crowded rings are
-        // split into up to MaxStagger sub-rings, assigned in angular order, so that nodes
-        // sharing a sub-ring are always at least NodeSpacing apart along the arc.
+        // Size each ring from the actual angular gaps between its nodes. A crowded ring is
+        // split into up to MaxStagger sub-rings (assigned in angular order); the ring only
+        // needs to be large enough that nodes sharing a sub-ring are NodeSpacing apart.
         double previousOuter = 0;
         double extent = 0;
         for (int d = 1; d < levels.Count; d++)
         {
             var ring = levels[d]; // Breadth-first order is also angular order.
-            double minSweep = ring.Min(i => i.Sweep);
-            double radius = Math.Max(previousOuter + RingGap, NodeSpacing / (minSweep * MaxStagger));
-            int subRings = Math.Clamp((int)Math.Ceiling(NodeSpacing / (minSweep * radius) - 1e-9), 1, MaxStagger);
+            double baseRadius = previousOuter + RingGap;
+            double radius = baseRadius;
+            int subRings = 1;
+            double best = double.MaxValue;
+            for (int k = 1; k <= MaxStagger; k++)
+            {
+                double needed = Math.Max(baseRadius, RequiredRadius(ring, k));
+                // Prefer fewer sub-rings unless more of them make the ring meaningfully smaller.
+                if (needed + ((k - 1) * StaggerGap) < best - 0.5)
+                {
+                    best = needed + ((k - 1) * StaggerGap);
+                    radius = needed;
+                    subRings = k;
+                }
+            }
 
             for (int i = 0; i < ring.Count; i++)
             {
                 var item = ring[i];
-                int level = i % subRings;
-                if (subRings > 1 && i == ring.Count - 1 && level == 0 && ring.Count > 1)
-                {
-                    level = 1; // Avoid meeting the first node on the same sub-ring across the wrap-around.
-                }
-
-                double r = radius + (level * StaggerGap);
-                double angle = item.Start + (item.Sweep / 2) - (Math.PI / 2);
+                double r = radius + ((i % subRings) * StaggerGap);
+                double angle = Center(item) - (Math.PI / 2);
                 output[item.Node.Key] = new MapPoint(r * Math.Cos(angle), r * Math.Sin(angle));
                 extent = Math.Max(extent, r);
             }
@@ -179,6 +185,42 @@ public static class RadialClusterLayout
         }
 
         return extent + ClusterMargin;
+    }
+
+    private static double Center(Item item) => item.Start + (item.Sweep / 2);
+
+    /// <summary>
+    /// Smallest radius at which every pair of nodes that share a sub-ring (when the ring is
+    /// split into <paramref name="subRings"/> levels by index) is at least NodeSpacing apart.
+    /// </summary>
+    private static double RequiredRadius(List<Item> ring, int subRings)
+    {
+        int count = ring.Count;
+        double required = 0;
+        for (int i = 0; i < count; i++)
+        {
+            // Only the next few neighbours in angular order can be close; include the wrap-around.
+            for (int step = 1; step <= subRings && step < count; step++)
+            {
+                int j = (i + step) % count;
+                if (i % subRings != j % subRings)
+                {
+                    continue;
+                }
+
+                double delta = Math.Abs(Center(ring[i]) - Center(ring[j]));
+                delta = Math.Min(delta, (2 * Math.PI) - delta);
+                if (delta <= 1e-9)
+                {
+                    return double.MaxValue;
+                }
+
+                // Chord length 2r·sin(delta/2) must reach NodeSpacing.
+                required = Math.Max(required, NodeSpacing / (2 * Math.Sin(delta / 2)));
+            }
+        }
+
+        return required;
     }
 
     private static Item BuildItems(ProcessGraph graph, GraphNode rootNode, out List<List<Item>> levels)

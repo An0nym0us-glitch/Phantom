@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Phantom.App.ViewModels;
+using Phantom.Core.Monitoring;
 
 namespace Phantom.App;
 
@@ -20,10 +21,23 @@ internal sealed class SmokeTest
     private readonly Window _window;
     private readonly string _directory;
     private readonly BindingErrorListener _bindingErrors = new();
+    private readonly List<double> _selfCpu = [];
     private bool _finished;
 
-    public SmokeTest(Application app, Window window, string directory)
+    public SmokeTest(Application app, Window window, string directory, MonitoringEngine engine)
     {
+        // Record Phantom's own CPU share from every frame so each page's steady-state cost can be reported.
+        engine.FrameProduced += frame =>
+        {
+            if (frame.Snapshot.FindByPid(Environment.ProcessId)?.CpuPercent is { } cpu)
+            {
+                lock (_selfCpu)
+                {
+                    _selfCpu.Add(cpu);
+                }
+            }
+        };
+
         _app = app;
         _window = window;
         _directory = directory;
@@ -51,9 +65,21 @@ internal sealed class SmokeTest
             foreach (var page in shell.Pages)
             {
                 shell.Current = page;
-                await Task.Delay(1800);
+                await Task.Delay(2200); // first-show work (template expansion, JIT) is not steady state
+                lock (_selfCpu)
+                {
+                    _selfCpu.Clear();
+                }
+
+                await Task.Delay(3300);
+                double cost;
+                lock (_selfCpu)
+                {
+                    cost = _selfCpu.Count > 0 ? _selfCpu.Average() : double.NaN;
+                }
+
                 Capture($"{index++:00}-{page.Title.Replace(' ', '-').ToLowerInvariant()}");
-                log.AppendLine($"Visited {page.Title}");
+                log.AppendLine($"Visited {page.Title,-18} steady-state self CPU {cost:0.0}% of {Environment.ProcessorCount} logical processors");
             }
 
             // System Map interactions: select, collapse, filter.
@@ -83,12 +109,11 @@ internal sealed class SmokeTest
             shell.Map.SearchText = "";
 
             // Inspect this very process end to end.
-            var me = shell.Processes.Rows.Count > 0 ? null : "pending";
             shell.InspectProcess(scene.Graph.Nodes.First(n => n.Process.Pid == Environment.ProcessId).Key);
             await Task.Delay(1500);
             if (shell.Processes.Selected?.Pid != Environment.ProcessId || !shell.Processes.Detail.HasProcess)
             {
-                throw new InvalidOperationException($"Inspecting the current process failed ({me}).");
+                throw new InvalidOperationException("Inspecting the current process failed.");
             }
 
             log.AppendLine($"Inspector: {shell.Processes.Detail.Name} | {shell.Processes.Detail.Path} | {shell.Processes.Detail.Architecture} | {shell.Processes.Detail.Owner}");

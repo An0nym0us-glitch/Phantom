@@ -9,7 +9,8 @@ using Phantom.SystemMap;
 namespace Phantom.App.Controls;
 
 /// <summary>What the map draws: a graph, its layout, and whether nodes or edges changed since the last scene.</summary>
-public sealed record MapScene(ProcessGraph Graph, GraphLayout Layout);
+/// <param name="Refit">True when the user changed what is shown (filter, collapse), so the camera should reframe.</param>
+public sealed record MapScene(ProcessGraph Graph, GraphLayout Layout, bool Refit = false);
 
 /// <summary>
 /// Custom-rendered, interactive process map.
@@ -25,6 +26,7 @@ public sealed class SystemMapCanvas : FrameworkElement
     private const double MaxZoom = 4;
     private const double LabelZoomThreshold = 0.7;
     private const int HeatSteps = 24;
+    private const double MinNodePixels = 3;
 
     public static readonly DependencyProperty SceneProperty = DependencyProperty.Register(
         nameof(Scene), typeof(MapScene), typeof(SystemMapCanvas),
@@ -209,6 +211,10 @@ public sealed class SystemMapCanvas : FrameworkElement
         {
             SnapAllToTargets();
             FitToView(animate: false);
+        }
+        else if (scene.Refit && _hasFitted)
+        {
+            FitToView();
         }
 
         InvalidateVisual();
@@ -456,7 +462,7 @@ public sealed class SystemMapCanvas : FrameworkElement
             }
 
             var p = ToScreen(world);
-            double radius = Math.Max(NodeRadius(node.Process) * _zoom, 4) + 3;
+            double radius = Math.Max(NodeRadius(node.Process) * _zoom, MinNodePixels + 1) + 3;
             double d = (p - screen).LengthSquared;
             if (d <= radius * radius && d < bestDistance)
             {
@@ -694,7 +700,7 @@ public sealed class SystemMapCanvas : FrameworkElement
         // Nodes, then labels on top so text is never hidden behind a neighbour.
         bool labelsByZoom = _zoom >= LabelZoomThreshold;
         double labelWidth = Math.Clamp(Math.Round(RadialClusterLayout.NodeSpacing * _zoom * 1.7 / 8) * 8, 56, 220);
-        List<(GraphNode Node, Point Center, double Radius, bool Strong)>? labels = null;
+        List<(GraphNode Node, Point Center, double Radius, int Priority)>? labels = null;
 
         foreach (var node in graph.Nodes)
         {
@@ -704,7 +710,7 @@ public sealed class SystemMapCanvas : FrameworkElement
             }
 
             var center = ToScreen(world);
-            double radius = Math.Max(NodeRadius(node.Process) * _zoom, 2.2);
+            double radius = Math.Max(NodeRadius(node.Process) * _zoom, MinNodePixels);
             if (!view.Contains(center))
             {
                 continue;
@@ -739,20 +745,46 @@ public sealed class SystemMapCanvas : FrameworkElement
                 dc.DrawEllipse(null, SelectionPen, center, radius + 3, radius + 3);
             }
 
-            bool strong = node.Key == SelectedKey || node.Key == _hover || isMatch || inLineage;
-            if (strong || (labelsByZoom && !dim))
+            // Lower number = more important. Important labels claim screen space first.
+            int priority = node.Key == SelectedKey ? 0 : node.Key == _hover ? 1 : isMatch ? 2 : inLineage ? 3 : 4;
+            if (priority < 4 || (labelsByZoom && !dim))
             {
-                (labels ??= []).Add((node, center, radius, strong));
+                (labels ??= []).Add((node, center, radius, priority));
             }
         }
 
         if (labels is not null)
         {
-            foreach (var (node, center, radius, strong) in labels)
+            // Greedy placement: a label is skipped when it would overlap one already drawn, so
+            // dense areas stay legible instead of turning into a smear of text.
+            labels.Sort((x, y) => x.Priority.CompareTo(y.Priority));
+            var occupied = new List<Rect>(Math.Min(labels.Count, 256));
+            foreach (var (node, center, radius, priority) in labels)
             {
                 string text = node.IsCollapsed ? $"{node.Process.Name}  +{node.HiddenDescendantCount}" : node.Process.Name;
-                var label = GetLabel(text, strong, labelWidth, dpi);
-                dc.DrawText(label, new Point(center.X - (label.Width / 2), center.Y + radius + 3));
+                var label = GetLabel(text, priority < 4, labelWidth, dpi);
+                var origin = new Point(center.X - (label.Width / 2), center.Y + radius + 3);
+                var box = new Rect(origin.X - 3, origin.Y, label.Width + 6, label.Height);
+                if (priority > 1)
+                {
+                    bool blocked = false;
+                    for (int i = 0; i < occupied.Count; i++)
+                    {
+                        if (occupied[i].IntersectsWith(box))
+                        {
+                            blocked = true;
+                            break;
+                        }
+                    }
+
+                    if (blocked)
+                    {
+                        continue;
+                    }
+                }
+
+                occupied.Add(box);
+                dc.DrawText(label, origin);
             }
         }
 
